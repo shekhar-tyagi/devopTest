@@ -1,0 +1,25 @@
+- hosts: all
+  remote_user: root
+  tasks:
+   # removing the ruby version other then the desired one.
+  - name: removin ruby
+    yum: name=ruby state=absent
+    when:{{ruby_version | version_compare('2.0' , '>=')}}
+ 
+   # download the desired ruby version only when the installed version is outdated
+  - name: Download Ruby 2.0.0-p353
+    get_url: https://cache.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p353.tar.gz checksum= SHA256: 465afc77d201b5815bb7ce3660a1f5a131f4429a3fa483c126ce66923e4726cc dest=/root/ruby-2.0.0-p353.tar.gz
+    when: {{ruby_version | version_compare('2.0' , '<=')}}
+    register: ruby
+
+   # extracting the files 
+  - name: unpack Ruby 2.0.0-p353
+    shell: mkdir -p /root/ruby-2.0.0-p353 && tar xzf /root/ruby-2.0.0-p353.tar.gz --strip 1 -c /root/ruby-2.0.0-p353
+    when: ruby|changed
+
+   # installing ruby using make and configure approach in the desired folder
+  - name: configure, make and make install ruby 2.0.0-p353
+    shell: cd /root/ruby-2.0.0-p353 && ./configure && make install
+    when: ruby|changed
+
+

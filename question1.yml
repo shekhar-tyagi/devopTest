@@ -1,15 +1,20 @@
 -Hosts: User1
  tasks:
+    # using the ifconfig and network name "eth0" to find out the ip address and extract exactly the ipv4 address part.
     - name: find out the ipv4 address
       command:  ifconfig eth0 | grep inet | cut -d: -f2 | awk '{print $2}'
 
+    # using the find command in shell to extract all the .conf files. 
     - name: find out all the .conf file in /etc/nginx
-      command: find /etc/nginx/ -name "*.conf"
+      shell: find /etc/nginx/ -name "*.conf"
 
     - name: replace all occurence of cruchbase.com with IP
+    # storing the ip address in IP variable
       vars:
 	IP: ${ansible_eth0.ipv4.address}
-      command: find /root -name "cruchbase.com" | xargs sed -i  's/Crunchbase.com/IP/g'
+    # first finding the occurences of crunchbase.com and then using sed to replace it with the IP address.  
+      Shell: find /root -name "cruchbase.com" | xargs sed -i  's/Crunchbase.com/IP/g'
     
+    # removing the extension part of the .conf files
     - name: remove extension files
-      command: for i in *.conf; do mv -v "$i" "${i%.conf}"; done
+      shell: for i in *.conf; do mv -v "$i" "${i%.conf}"; done
