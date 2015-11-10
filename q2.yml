@@ -4,7 +4,7 @@
    # removing the ruby version other then the desired one.
   - name: removin ruby
     yum: name=ruby state=absent
-    when:{{ruby_version | version_compare('2.0' , '>=')}}
+    when: {{ruby_version | version_compare('2.0' , '>=')}}
  
    # download the desired ruby version only when the installed version is outdated
   - name: Download Ruby 2.0.0-p353
